@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { AuthProvider, AuthGate } from '@/context/AuthContext';
 
 export const metadata: Metadata = {
   title: 'Climate Intelligence Platform | Baghdad Climate Observatory',
@@ -23,14 +24,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="grid-bg scanlines" suppressHydrationWarning>
         <ThemeProvider>
-          {/* Ambient background gradients */}
-          <div className="fixed inset-0 pointer-events-none z-0" aria-hidden="true">
-            <div className="absolute top-0 left-60 w-96 h-96 rounded-full"
-              style={{ background: 'radial-gradient(circle, rgba(0,229,255,0.04) 0%, transparent 70%)', transform: 'translate(-50%, -30%)' }} />
-            <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full"
-              style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.05) 0%, transparent 70%)' }} />
-          </div>
-          {children}
+          <AuthProvider>
+            <AuthGate>
+              {/* Ambient background gradients */}
+              <div className="fixed inset-0 pointer-events-none z-0" aria-hidden="true">
+                <div className="absolute top-0 left-60 w-96 h-96 rounded-full"
+                  style={{ background: 'radial-gradient(circle, rgba(0,229,255,0.04) 0%, transparent 70%)', transform: 'translate(-50%, -30%)' }} />
+                <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full"
+                  style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.05) 0%, transparent 70%)' }} />
+              </div>
+              {children}
+            </AuthGate>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

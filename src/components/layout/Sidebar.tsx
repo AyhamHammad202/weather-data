@@ -5,9 +5,10 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Thermometer, CloudRain, Droplets, Wind, Sun, Gauge,
-  ChevronLeft, ChevronRight, Activity, Zap
+  ChevronLeft, ChevronRight, Activity, Zap, LogOut
 } from 'lucide-react';
 import { VARIABLES, ClimateVariable } from '@/lib/chartData';
+import { useAuth } from '@/context/AuthContext';
 
 const NAV_ITEMS: { variable: ClimateVariable; icon: React.ElementType; href: string }[] = [
   { variable: 'temperature', icon: Thermometer, href: '/temperature' },
@@ -22,6 +23,7 @@ const NAV_ITEMS: { variable: ClimateVariable; icon: React.ElementType; href: str
 export default function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const { logout } = useAuth();
 
   return (
     <motion.aside
@@ -91,6 +93,31 @@ export default function Sidebar() {
             />
           );
         })}
+
+        <div className="mx-3 my-2 border-t border-white/5" />
+
+        <button
+          onClick={logout}
+          className="flex items-center gap-3 mx-2 my-0.5 px-2 py-2.5 rounded-lg cursor-pointer transition-all duration-200 hover:bg-white/5 w-[calc(100%-16px)] text-left"
+        >
+          <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-neon-red">
+            <LogOut size={16} style={{ color: '#ff1744' }} />
+          </div>
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.span
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -8 }}
+                transition={{ duration: 0.15 }}
+                className="text-sm font-medium whitespace-nowrap overflow-hidden"
+                style={{ color: '#ff1744' }}
+              >
+                Sign Out
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </button>
       </nav>
 
       {/* System Status */}
