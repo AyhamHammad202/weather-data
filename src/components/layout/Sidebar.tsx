@@ -20,19 +20,66 @@ const NAV_ITEMS: { variable: ClimateVariable; icon: React.ElementType; href: str
   { variable: 'pressure',    icon: Gauge,       href: '/pressure' },
 ];
 
+import { useTheme } from '@/context/ThemeContext';
+import { useEffect } from 'react';
+
 export default function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const { logout } = useAuth();
+  const { mobileSidebarOpen, setMobileSidebarOpen } = useTheme();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      if (!mobile) setMobileSidebarOpen(false);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [setMobileSidebarOpen]);
+
+  // Sync CSS custom variable for side offset dynamically
+  useEffect(() => {
+    if (isMobile) {
+      document.documentElement.style.setProperty('--sidebar-offset', '0px');
+    } else {
+      document.documentElement.style.setProperty('--sidebar-offset', collapsed ? '64px' : '240px');
+    }
+  }, [collapsed, isMobile]);
+
+  useEffect(() => {
+    setMobileSidebarOpen(false);
+  }, [pathname, setMobileSidebarOpen]);
 
   return (
-    <motion.aside
-      initial={false}
-      animate={{ width: collapsed ? 64 : 240 }}
-      transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-      className="fixed left-0 top-0 bottom-0 z-50 flex flex-col glass-heavy overflow-hidden"
-      style={{ borderRight: '1px solid var(--border-glass)' }}
-    >
+    <>
+      {/* Mobile Backdrop Overlay */}
+      <AnimatePresence>
+        {isMobile && mobileSidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+            onClick={() => setMobileSidebarOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      <motion.aside
+        initial={false}
+        animate={{
+          width: isMobile ? 240 : (collapsed ? 64 : 240),
+          x: isMobile ? (mobileSidebarOpen ? 0 : -240) : 0,
+        }}
+        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+        className={`fixed left-0 top-0 bottom-0 z-50 flex flex-col glass-heavy overflow-hidden
+          ${isMobile ? 'shadow-2xl shadow-black/80' : ''}`}
+        style={{ borderRight: '1px solid var(--border-glass)' }}
+      >
       {/* Logo */}
       <div className="flex items-center h-16 px-3 border-b border-white/5">
         <div className="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0"
@@ -154,21 +201,24 @@ export default function Sidebar() {
       </div>
 
       {/* Collapse Toggle */}
-      <button
-        onClick={() => setCollapsed(c => !c)}
-        className="absolute -right-3 top-20 z-10 w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-110"
-        style={{
-          background: 'var(--bg-glass-card)',
-          border: '1px solid rgba(0,229,255,0.3)',
-          boxShadow: '0 0 12px rgba(0,229,255,0.2)',
-        }}
-        aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-      >
-        {collapsed
-          ? <ChevronRight size={12} style={{ color: '#00e5ff' }} />
-          : <ChevronLeft size={12} style={{ color: '#00e5ff' }} />}
-      </button>
+      {!isMobile && (
+        <button
+          onClick={() => setCollapsed(c => !c)}
+          className="absolute -right-3 top-20 z-10 w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-110"
+          style={{
+            background: 'var(--bg-glass-card)',
+            border: '1px solid rgba(0,229,255,0.3)',
+            boxShadow: '0 0 12px rgba(0,229,255,0.2)',
+          }}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {collapsed
+            ? <ChevronRight size={12} style={{ color: '#00e5ff' }} />
+            : <ChevronLeft size={12} style={{ color: '#00e5ff' }} />}
+        </button>
+      )}
     </motion.aside>
+  </>
   );
 }
 

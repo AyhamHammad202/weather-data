@@ -1,7 +1,7 @@
 'use client';
 import React, { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Bell, Settings, Download, Star, Sun, Moon } from 'lucide-react';
+import { Search, X, Bell, Settings, Download, Star, Sun, Moon, Menu } from 'lucide-react';
 import { ALL_CHARTS, ANALYTICS } from '@/lib/chartData';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -24,7 +24,15 @@ export default function Header({
   const [time, setTime] = useState('');
   const [date, setDate] = useState('');
   const [focused, setFocused] = useState(false);
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, mobileSidebarOpen, toggleMobileSidebar } = useTheme();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const update = () => {
@@ -59,25 +67,37 @@ export default function Header({
         transition: 'left 0.3s ease',
       }}
     >
+      {/* Mobile Hamburger Menu Button */}
+      {isMobile && (
+        <button
+          onClick={toggleMobileSidebar}
+          className="p-2 rounded-lg ml-4 mr-1 hover:bg-white/5 text-neon-cyan active:scale-95 transition-all"
+          style={{ border: '1px solid rgba(0,229,255,0.15)', background: 'rgba(0,229,255,0.03)' }}
+          aria-label="Toggle Menu"
+        >
+          {mobileSidebarOpen ? <X size={14} /> : <Menu size={14} />}
+        </button>
+      )}
+
       {/* Platform Title */}
-      <div className="flex items-center gap-3 px-6 border-r border-white/5 h-full">
+      <div className="flex items-center gap-3 px-4 sm:px-6 border-r border-white/5 h-full">
         <div>
-          <div className="text-sm font-bold tracking-wider uppercase"
+          <div className="text-xs sm:text-sm font-bold tracking-wider uppercase"
             style={{ color: '#e8f4ff', letterSpacing: '0.12em' }}>
-            Climate Intelligence
+            Climate Intel
           </div>
-          <div className="flex items-center gap-2 mt-0.5">
+          <div className="hidden sm:flex items-center gap-2 mt-0.5">
             <div className="status-dot" style={{ width: 5, height: 5 }} />
             <span className="text-[9px] font-mono tracking-widest uppercase"
               style={{ color: '#00ff88' }}>
-              Live · {ANALYTICS.totalCharts} Charts · {ANALYTICS.totalYears}yr Dataset
+              Live · {ANALYTICS.totalCharts} Charts
             </span>
           </div>
         </div>
       </div>
 
       {/* Search Bar */}
-      <div className="flex-1 px-6 max-w-xl">
+      <div className="flex-1 px-3 sm:px-6 max-w-md sm:max-w-xl">
         <div
           className="relative flex items-center rounded-xl transition-all duration-300"
           style={{
@@ -90,7 +110,7 @@ export default function Header({
           <input
             ref={inputRef}
             type="text"
-            placeholder="Search charts, variables, months… (Ctrl+F)"
+            placeholder={isMobile ? "Search..." : "Search charts, variables, months… (Ctrl+F)"}
             value={searchQuery}
             onChange={e => onSearchChange(e.target.value)}
             onFocus={() => setFocused(true)}

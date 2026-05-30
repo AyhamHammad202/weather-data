@@ -6,12 +6,16 @@ type Theme = 'light' | 'dark';
 interface ThemeContextType {
   theme: Theme;
   toggleTheme: () => void;
+  mobileSidebarOpen: boolean;
+  toggleMobileSidebar: () => void;
+  setMobileSidebarOpen: (open: boolean) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('dark');
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -41,8 +45,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
   };
 
+  const toggleMobileSidebar = () => {
+    setMobileSidebarOpen(prev => !prev);
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{
+      theme,
+      toggleTheme,
+      mobileSidebarOpen,
+      toggleMobileSidebar,
+      setMobileSidebarOpen
+    }}>
       {children}
     </ThemeContext.Provider>
   );

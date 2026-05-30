@@ -13,7 +13,6 @@ const STATS = [
   { label: 'Max Evap', value: '16', unit: 'mm/day', color: '#f77f00' },
   { label: 'Year Start', value: `${ANALYTICS.dataYearStart}`, unit: '', color: '#00ff88' },
 ];
-
 export default function StatsBar() {
   return (
     <div className="rounded-xl overflow-hidden mb-6"
@@ -21,7 +20,7 @@ export default function StatsBar() {
       {/* Top accent */}
       <div className="h-px w-full" style={{ background: 'linear-gradient(90deg, transparent, #00e5ff40, #2979ff40, #7c3aed40, transparent)' }} />
 
-      <div className="grid grid-cols-4 md:grid-cols-8 divide-x"
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8"
         style={{ borderColor: 'var(--chart-grid-color)' }}>
         {STATS.map((stat, i) => (
           <motion.div
@@ -29,7 +28,7 @@ export default function StatsBar() {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.06 }}
-            className="px-3 py-3 text-center border-r"
+            className="px-3 py-3 text-center border-b border-r"
             style={{ borderColor: 'var(--chart-grid-color)' }}
           >
             <div className="text-lg font-black font-mono leading-none" style={{ color: stat.color }}>

@@ -49,7 +49,7 @@ export default function VariablePageClient({ variable }: VariablePageClientProps
       <Sidebar />
 
       <div className="flex-1 flex flex-col min-h-screen"
-        style={{ marginLeft: 240, paddingTop: 64, transition: 'margin-left 0.3s ease' }}>
+        style={{ marginLeft: 'var(--sidebar-offset, 240px)', paddingTop: 64, transition: 'margin-left 0.3s ease' }}>
         <Header
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
