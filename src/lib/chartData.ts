@@ -366,9 +366,21 @@ function getFolderName(variable: ClimateVariable): string {
   }
 }
 
-const isGithubActions = typeof process !== 'undefined' && process.env.GITHUB_ACTIONS === 'true';
-const repoName = typeof process !== 'undefined' && process.env.GITHUB_REPOSITORY ? '/' + process.env.GITHUB_REPOSITORY.split('/')[1] : '';
-export const basePath = isGithubActions ? repoName : '';
+const getBasePath = () => {
+  const isGithubActions = typeof process !== 'undefined' && process.env.GITHUB_ACTIONS === 'true';
+  const repoName = typeof process !== 'undefined' && process.env.GITHUB_REPOSITORY ? '/' + process.env.GITHUB_REPOSITORY.split('/')[1] : '';
+  if (isGithubActions && repoName) {
+    return repoName;
+  }
+  if (typeof window !== 'undefined') {
+    if (window.location.hostname.endsWith('github.io')) {
+      return '/weather-data';
+    }
+  }
+  return '';
+};
+
+export const basePath = getBasePath();
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━
 // CHART REGISTRY BUILDER
